@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: web-apps
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: voting-app
+  namespace: web-apps
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: voting-app
+  template:
+    metadata:
+      labels:
+        app: voting-app
+    spec:
+      containers:
+      - name: voting-web
+        image: node:20-alpine
+        command: ["node", "-e"]
+        args:
+          - |
+            const http = require('http');
+            let votes = { gitops: 0, devops: 0 };
+            const server = http.createServer((req, res) => {
+              res.setHeader('Access-Control-Allow-Origin', '*');
+              if (req.url === '/api/results' && req.method === 'GET') {
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                res.end(JSON.stringify(votes));
+              } else if (req.url === '/api/vote' && req.method === 'POST') {
+                let body = '';
+                req.on('data', c => body += c);
+                req.on('end', () => {
+                  try { const d = JSON.parse(body); if(votes[d.team] !== undefined) votes[d.team]++; } catch(e){}
+                  res.writeHead(200, {'Content-Type': 'application/json'}); res.end(JSON.stringify({success:true}));
+                });
+              } else {
+                res.writeHead(200, {'Content-Type': 'text/html'});
+                res.end(`<h2>Live GitOps Node Sandbox Cluster Running.</h2>`);
+              }
+            });
+            server.listen(3000);
+        ports:
+        - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: voting-app-service
+  namespace: web-apps
+spec:
+  selector:
+    app: voting-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: ClusterIP
