@@ -1,0 +1,19 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: voting-app-scaler
+  namespace: web-apps
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: voting-app
+  minReplicas: 2    #The lower boundary: your system will never drop below 2 live copies
+  maxReplicas: 10   #The upper boundary: your cluster can expand up to 10 copies during traffic spikes
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50  #If the average CPU load across pods exceeds 50%, add more copies
