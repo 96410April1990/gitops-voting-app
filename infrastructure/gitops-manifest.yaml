@@ -21,6 +21,13 @@ spec:
       containers:
       - name: voting-web
         image: node:20-alpine
+        resources:
+          requests:
+            cpu: "100m"      # This defines 100% baseline ceiling for HPA math
+            memory: "64Mi"
+          limits:
+            cpu: "200m"
+            memory: "128Mi"
         command: ["node", "-e"]
         args:
           - |
