@@ -40,7 +40,7 @@ spec:
                 });
               } else {
                 res.writeHead(200, {'Content-Type': 'text/html'});
-                res.end(`<h2>Live GitOps Node Sandbox Cluster Running.</h2>`);
+                res.end(`<h2>Live GitOps Node Sandbox Cluster Running - VERSION 2.0.</h2>`);
               }
             });
             server.listen(3000);
