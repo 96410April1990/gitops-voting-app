@@ -28,6 +28,12 @@ spec:
           limits:
             cpu: "200m"
             memory: "128Mi"
+        env:
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: voting-db-credentials
+              key: db-password
         command: ["node", "-e"]
         args:
           - |
