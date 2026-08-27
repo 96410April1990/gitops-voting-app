@@ -9,6 +9,7 @@ metadata:
   name: voting-app
   namespace: web-apps
 spec:
+  revisionHistoryLimit: 2
   replicas: 2
   selector:
     matchLabels:
